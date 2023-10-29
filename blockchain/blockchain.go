@@ -9,20 +9,30 @@ import (
 
 // block 구조체는 blockchain의 block을 정의하는 구조체 입니다.
 type block struct {
-	data     string
-	hash     string
-	prevHash string
+	Data     string
+	Hash     string
+	PrevHash string
 }
 
+// calucateHash 함수는 receiver pointer 값으로 넘어온 b(block)의 hash값을 대신 연산해주는 코드 입니다.
 func (b *block) calculateHash() {
-	hash := sha256.Sum256([]byte(b.data + b.prevHash))
-	b.hash = fmt.Sprintf("%x", hash)
+	hash := sha256.Sum256([]byte(b.Data + b.PrevHash))
+	b.Hash = fmt.Sprintf("%x", hash)
 }
 
 // blockchain 구조체는 blockchain을 정의하는 구조체 입니다.
 // 각각의 block은 block instance의 주소를 저장합니다.
 type blockchain struct {
 	blocks []*block
+}
+
+// AddBlock함수는 pointer receiver인 b의 blocks 필드를 data 값만 인자로 받고 block을 추가해주는 함수 입니다.
+func (b *blockchain) AddBlock(data string) {
+	b.blocks = append(b.blocks, createBlock(data))
+}
+
+func (b *blockchain) AllBlocks() []*block {
+	return b.blocks
 }
 
 // b 인스턴스는 singleton pattern으로, 해당 인스턴스를 application에 공유하는 것이 아니라 어떠한 함수를 통해 공유합니다.
@@ -37,7 +47,7 @@ func getLastHash() string {
 	if totalBlocks == 0 {
 		return ""
 	}
-	return GetBlock().blocks[totalBlocks-1].hash
+	return GetBlock().blocks[totalBlocks-1].Hash
 }
 
 // createBlock 함수는 data를 인자로 받아 블럭을 생성하고,
@@ -57,7 +67,7 @@ func GetBlock() *blockchain {
 		// Only once
 		once.Do(func() {
 			b = new(blockchain)
-			b.blocks = append(b.blocks, createBlock("Genesiss Block"))
+			b.AddBlock("Genesiss block")
 		})
 	}
 	return b
