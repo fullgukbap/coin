@@ -31,6 +31,7 @@ func (b *blockchain) AddBlock(data string) {
 	b.blocks = append(b.blocks, createBlock(data))
 }
 
+// AllBlocks 함수는 blockchain의 recevier포인터로, b의 blocks를 반환하는 함수 입니다.
 func (b *blockchain) AllBlocks() []*block {
 	return b.blocks
 }
@@ -42,6 +43,8 @@ var b *blockchain
 // once는 Do method를 사용하기 위해 선언한 변수 입니다.
 var once sync.Once
 
+// getLastHash 함수는 이전의 blockchain의 이전의 해쉬 값을 반환하는 함수 입니다.
+// 만약 첫번쨰 블럭이 이 함수를 호출했을 경우 ""를 반환합니다.
 func getLastHash() string {
 	totalBlocks := len(GetBlock().blocks)
 	if totalBlocks == 0 {
