@@ -7,15 +7,15 @@ import (
 	"sync"
 )
 
-// block 구조체는 blockchain의 block을 정의하는 구조체 입니다.
-type block struct {
+// Block 구조체는 blockchain의 block을 정의하는 구조체 입니다.
+type Block struct {
 	Data     string
 	Hash     string
 	PrevHash string
 }
 
 // calucateHash 함수는 receiver pointer 값으로 넘어온 b(block)의 hash값을 대신 연산해주는 코드 입니다.
-func (b *block) calculateHash() {
+func (b *Block) calculateHash() {
 	hash := sha256.Sum256([]byte(b.Data + b.PrevHash))
 	b.Hash = fmt.Sprintf("%x", hash)
 }
@@ -23,7 +23,7 @@ func (b *block) calculateHash() {
 // blockchain 구조체는 blockchain을 정의하는 구조체 입니다.
 // 각각의 block은 block instance의 주소를 저장합니다.
 type blockchain struct {
-	blocks []*block
+	blocks []*Block
 }
 
 // AddBlock함수는 pointer receiver인 b의 blocks 필드를 data 값만 인자로 받고 block을 추가해주는 함수 입니다.
@@ -32,7 +32,7 @@ func (b *blockchain) AddBlock(data string) {
 }
 
 // AllBlocks 함수는 blockchain의 recevier포인터로, b의 blocks를 반환하는 함수 입니다.
-func (b *blockchain) AllBlocks() []*block {
+func (b *blockchain) AllBlocks() []*Block {
 	return b.blocks
 }
 
@@ -56,8 +56,8 @@ func getLastHash() string {
 // createBlock 함수는 data를 인자로 받아 블럭을 생성하고,
 // getLastHash()함수를 사용하여 전 블럭의 해쉬를 가져오고
 // calculateHash() 함수를 사용해 hash값을 연산합니다.
-func createBlock(data string) *block {
-	block := block{data, "", getLastHash()}
+func createBlock(data string) *Block {
+	block := Block{data, "", getLastHash()}
 	block.calculateHash()
 
 	return &block
