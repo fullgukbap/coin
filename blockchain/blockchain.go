@@ -46,11 +46,11 @@ var once sync.Once
 // getLastHash 함수는 이전의 blockchain의 이전의 해쉬 값을 반환하는 함수 입니다.
 // 만약 첫번쨰 블럭이 이 함수를 호출했을 경우 ""를 반환합니다.
 func getLastHash() string {
-	totalBlocks := len(GetBlock().blocks)
+	totalBlocks := len(GetBlockchain().blocks)
 	if totalBlocks == 0 {
 		return ""
 	}
-	return GetBlock().blocks[totalBlocks-1].Hash
+	return GetBlockchain().blocks[totalBlocks-1].Hash
 }
 
 // createBlock 함수는 data를 인자로 받아 블럭을 생성하고,
@@ -65,7 +65,7 @@ func createBlock(data string) *Block {
 
 // GetBlock() 함수는 b instance를 얻을 수 있는 함수 입니다.
 // Singleton pattern을 사용함으로써 b instace의 초기화는 이 함수에서 다 이루어 집니다.
-func GetBlock() *blockchain {
+func GetBlockchain() *blockchain {
 	if b == nil {
 		// Only once
 		once.Do(func() {
