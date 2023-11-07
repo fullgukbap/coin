@@ -1,9 +1,39 @@
 package main
 
-import "github.com/JJerBum/nomadcoin/explorer"
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
 
-// rw: 값을 반환해 주는 함수
-// r : 클라이언트의 request
+	"github.com/JJerBum/nomadcoin/utils"
+)
+
+var port string = ":4000"
+
+type URLDescription struct {
+	URL         string
+	Method      string
+	Description string
+}
+
+func documentation(rw http.ResponseWriter, r *http.Request) {
+	data := []URLDescription{
+		{
+			URL:         "/",
+			Method:      "GET",
+			Description: "See Documentation",
+		},
+	}
+
+	b, err := json.Marshal(data)
+	utils.HandleErr(err)
+	fmt.Printf("%s", b)
+}
+
 func main() {
-	explorer.Start()
+	http.HandleFunc("/", documentation)
+	fmt.Printf("Listening on localhost%s\n", port)
+	log.Fatal(http.ListenAndServe(port, nil))
+
 }
