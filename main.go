@@ -11,24 +11,37 @@ import (
 
 var port string = ":4000"
 
+type URL string
+
+func (u URL) MarshalText() ([]byte, error) {
+	url := fmt.Sprintf("http://localhost%s%s", port, u)
+	return []byte(url), nil
+}
+
 type URLDescription struct {
-	URL         string
-	Method      string
-	Description string
+	URL         URL    `json:"url"`
+	Method      string `json:"method"`
+	Description string `json:"description"`
+	Payload     string `json:"payload,omitempty"`
 }
 
 func documentation(rw http.ResponseWriter, r *http.Request) {
 	data := []URLDescription{
 		{
-			URL:         "/",
+			URL:         URL("/"),
 			Method:      "GET",
 			Description: "See Documentation",
 		},
+		{
+			URL:         URL("/blocks"),
+			Method:      "POST",
+			Description: "Add a block",
+			Payload:     "data:string",
+		},
 	}
 
-	b, err := json.Marshal(data)
-	utils.HandleErr(err)
-	fmt.Printf("%s", b)
+	rw.Header().Add("Content-Type", "application/json")
+	utils.HandleErr(json.NewEncoder(rw).Encode(data))
 }
 
 func main() {

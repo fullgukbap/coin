@@ -54,6 +54,7 @@ func add(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 func Start() {
+	template.ParseFiles()
 	// ParseGlob은 새 템플릿을 생성하고 패턴으로 식별된 파일에서 템플릿 정의를 구문 분석합니다.
 	// 전역변수 templates에 ./templates/pages/*.gohtml 구문 분석
 	templates = template.Must(template.ParseGlob(templateDir + "pages/*.gohtml"))
