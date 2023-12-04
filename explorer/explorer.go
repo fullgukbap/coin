@@ -53,7 +53,8 @@ func add(rw http.ResponseWriter, r *http.Request) {
 
 	}
 }
-func Start() {
+func Start(port int) {
+	handler := http.NewServeMux()
 	template.ParseFiles()
 	// ParseGlob은 새 템플릿을 생성하고 패턴으로 식별된 파일에서 템플릿 정의를 구문 분석합니다.
 	// 전역변수 templates에 ./templates/pages/*.gohtml 구문 분석
@@ -64,9 +65,10 @@ func Start() {
 
 	// 핸들러 등록
 	// 이 핸들러는 메서드 말고 패턴으로 식별해서 핸득러에 요청을 처리학하게 합니다.
-	http.HandleFunc("/", home)
-	http.HandleFunc("/add", add)
-	fmt.Printf("Listening on http://localhost%s\n", port)
 
-	log.Fatal(http.ListenAndServe(port, nil))
+	handler.HandleFunc("/", home)
+	handler.HandleFunc("/add", add)
+	fmt.Printf("Listening on localhost:%d\n", port)
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handler))
 }

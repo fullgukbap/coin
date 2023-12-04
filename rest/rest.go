@@ -10,44 +10,47 @@ import (
 	"github.com/JJerBum/nomadcoin/utils"
 )
 
-var port string = ":4000"
+var port string
 
-type URL string
+type url string
 
-func (u URL) MarshalText() ([]byte, error) {
+func (u url) MarshalText() ([]byte, error) {
 	url := fmt.Sprintf("http://localhost%s%s", port, u)
 	return []byte(url), nil
 }
 
-type URLDescription struct {
-	URL         URL    `json:"url"`
+type urlDescription struct {
+	URL         url    `json:"url"`
 	Method      string `json:"method"`
 	Description string `json:"description"`
 	Payload     string `json:"payload,omitempty"`
 }
 
-type AddBlockBody struct {
+type addBlockBody struct {
 	Message string `json:"message"`
 }
 
 func documentation(rw http.ResponseWriter, r *http.Request) {
-	data := []URLDescription{
+	data := []urlDescription{
 		{
-			URL:         URL("/"),
+			URL:         url("/"),
 			Method:      "GET",
 			Description: "See Documentation",
 		},
 		{
-			URL:         URL("/blocks/{id}"),
+			URL:         url("/blocks"),
 			Method:      "GET",
-			Description: "See a block",
-			Payload:     "data:string",
+			Description: "See all block",
 		},
 		{
-			URL:         URL("/blocks"),
+			URL:         url("/blocks/{id}"),
+			Method:      "GET",
+			Description: "See a block",
+		},
+		{
+			URL:         url("/blocks"),
 			Method:      "POST",
 			Description: "Add a block",
-			Payload:     "data:string",
 		},
 	}
 
@@ -62,7 +65,7 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
 	case http.MethodPost:
 		// request client example body -> {"message": "my block data"}
-		var addBlockBody AddBlockBody
+		var addBlockBody addBlockBody
 		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
 		blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
 		rw.WriteHeader(http.StatusCreated)
@@ -70,9 +73,11 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Start() {
-	http.HandleFunc("/", documentation)
-	http.HandleFunc("/blocks", blocks)
+func Start(aPort int) {
+	handler := http.NewServeMux()
+	port = fmt.Sprintf(":%d", aPort)
+	handler.HandleFunc("/", documentation)
+	handler.HandleFunc("/blocks", blocks)
 	fmt.Printf("Listening on localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Fatal(http.ListenAndServe(port, handler))
 }
