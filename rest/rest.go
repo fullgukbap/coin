@@ -60,14 +60,12 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	rw.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(data)
 }
 
 func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		rw.Header().Add("Content-Type", "application/json")
 		json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
 	case http.MethodPost:
 		// request client example body -> {"message": "my block data"}
@@ -75,7 +73,6 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
 		blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
 		rw.WriteHeader(http.StatusCreated)
-
 	}
 }
 
@@ -90,11 +87,19 @@ func block(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		encoder.Encode(block)
 	}
+}
 
+func jsonContentTypeMiddleware(next http.Handler) http.Handler {
+	// 아래의 HandlerFunc type은 adapter이며, ServeHTTP 인터페이스를 구현해준다.
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("Content-Type", "application/json")
+		next.ServeHTTP(rw, r)
+	})
 }
 
 func Start(aPort int) {
 	router := mux.NewRouter()
+	router.Use(jsonContentTypeMiddleware)
 	port = fmt.Sprintf(":%d", aPort)
 	router.HandleFunc("/", documentation).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
