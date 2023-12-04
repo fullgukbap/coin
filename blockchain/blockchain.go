@@ -9,9 +9,10 @@ import (
 
 // Block 구조체는 blockchain의 block을 정의하는 구조체 입니다.
 type Block struct {
-	Data     string
-	Hash     string
-	PrevHash string
+	Data     string `json:"data"`
+	Hash     string `json:"hash"`
+	PrevHash string `json:"prevHash,omitempty"`
+	Height   int    `json:"height"`
 }
 
 // calucateHash 함수는 receiver pointer 값으로 넘어온 b(block)의 hash값을 대신 연산해주는 코드 입니다.
@@ -57,10 +58,14 @@ func getLastHash() string {
 // getLastHash()함수를 사용하여 전 블럭의 해쉬를 가져오고
 // calculateHash() 함수를 사용해 hash값을 연산합니다.
 func createBlock(data string) *Block {
-	block := Block{data, "", getLastHash()}
+	block := Block{data, "", getLastHash(), len(GetBlockchain().AllBlocks()) + 1}
 	block.calculateHash()
 
 	return &block
+}
+
+func (b *blockchain) GetBlock(height int) *Block {
+	return b.blocks[height-1]
 }
 
 // GetBlock() 함수는 b instance를 얻을 수 있는 함수 입니다.

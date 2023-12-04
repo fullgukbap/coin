@@ -7,3 +7,5 @@ POST http://127.0.0.1:4000/blocks
 {
     "message": "Data for my block"
 }
+###
+http://127.0.0.1:4000/blocks/1
