@@ -3,6 +3,7 @@ package blockchain
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"sync"
 )
@@ -64,8 +65,14 @@ func createBlock(data string) *Block {
 	return &block
 }
 
-func (b *blockchain) GetBlock(height int) *Block {
-	return b.blocks[height-1]
+var ErrNotFound = errors.New("block not found")
+
+func (b *blockchain) GetBlock(height int) (*Block, error) {
+	if height > len(b.blocks) {
+		return nil, ErrNotFound
+	}
+
+	return b.blocks[height-1], nil
 }
 
 // GetBlock() 함수는 b instance를 얻을 수 있는 함수 입니다.
