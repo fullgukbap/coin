@@ -2,6 +2,9 @@
 package blockchain
 
 import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
 	"sync"
 
 	"github.com/JJerBum/nomadcoin/db"
@@ -22,6 +25,11 @@ var b *blockchain
 // once는 Do method를 사용하기 위해 선언한 변수 입니다.
 var once sync.Once
 
+func (b *blockchain) restore(data []byte) {
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	utils.HandleErr(decoder.Decode(b))
+}
+
 func (b *blockchain) persist() {
 	db.SaveBlockchain(utils.ToBytes(b))
 }
@@ -40,7 +48,20 @@ func Blockchain() *blockchain {
 		// Only once
 		once.Do(func() {
 			b = &blockchain{"", 0}
-			b.AddBlock("Genesis block")
+			fmt.Printf("NewestHash: %s\nHeight: %d\n", b.NewestHash, b.Height)
+
+			// search for checkpoint on the db
+			checkpoint := db.Checkpoint()
+			if checkpoint == nil {
+				fmt.Printf("NewestHash: %s\nHeight: %d\n", b.NewestHash, b.Height)
+				b.AddBlock("Genesis block")
+			} else {
+				fmt.Printf("restoring\n")
+				// restore b from bytes
+				b.restore(checkpoint)
+				fmt.Printf("NewestHash: %s\nHeight: %d\n", b.NewestHash, b.Height)
+			}
+
 		})
 	}
 	return b

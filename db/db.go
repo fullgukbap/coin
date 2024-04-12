@@ -2,8 +2,6 @@
 package db
 
 import (
-	"fmt"
-
 	"github.com/JJerBum/nomadcoin/utils"
 	"github.com/boltdb/bolt"
 )
@@ -12,6 +10,8 @@ const (
 	dbName      = "blockchain.db"
 	dataBucket  = "data"
 	blockBucket = "blocks"
+
+	checkpoint = "checkpoint"
 )
 
 var db *bolt.DB
@@ -38,7 +38,7 @@ func DB() *bolt.DB {
 
 // SaveBlock 함수는 말 그대로 Block을 저장하는 함수 입니다.
 func SaveBlock(hash string, data []byte) {
-	fmt.Printf("Saving Block %s\nData: %b\n", hash, data)
+	// fmt.Printf("Saving Block %s\nData: %b\n", hash, data)
 	err := DB().Update(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(blockBucket))
 		err := bucket.Put([]byte(hash), data)
@@ -50,8 +50,18 @@ func SaveBlock(hash string, data []byte) {
 func SaveBlockchain(data []byte) {
 	err := DB().Update(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(dataBucket))
-		err := bucket.Put([]byte("checkpoint"), data)
+		err := bucket.Put([]byte(checkpoint), data)
 		return err
 	})
 	utils.HandleErr(err)
+}
+
+func Checkpoint() []byte {
+	var data []byte
+	DB().View(func(t *bolt.Tx) error {
+		bucket := t.Bucket([]byte(dataBucket))
+		data = bucket.Get([]byte(checkpoint))
+		return nil
+	})
+	return data
 }
