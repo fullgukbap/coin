@@ -2,6 +2,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/JJerBum/nomadcoin/utils"
 	"github.com/boltdb/bolt"
 )
@@ -36,6 +38,7 @@ func DB() *bolt.DB {
 
 // SaveBlock 함수는 말 그대로 Block을 저장하는 함수 입니다.
 func SaveBlock(hash string, data []byte) {
+	fmt.Printf("Saving Block %s\nData: %b\n", hash, data)
 	err := DB().Update(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(blockBucket))
 		err := bucket.Put([]byte(hash), data)

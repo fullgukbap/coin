@@ -3,6 +3,9 @@ package blockchain
 
 import (
 	"sync"
+
+	"github.com/JJerBum/nomadcoin/db"
+	"github.com/JJerBum/nomadcoin/utils"
 )
 
 // blockchain 구조체는 blockchain을 정의하는 구조체 입니다.
@@ -19,11 +22,15 @@ var b *blockchain
 // once는 Do method를 사용하기 위해 선언한 변수 입니다.
 var once sync.Once
 
+func (b *blockchain) persist() {
+	db.SaveBlockchain(utils.ToBytes(b))
+}
+
 func (b *blockchain) AddBlock(data string) {
-	block := createBlock(data, b.NewestHash, b.Height)
+	block := createBlock(data, b.NewestHash, b.Height+1)
 	b.NewestHash = block.Hash
 	b.Height = block.Height
-
+	b.persist()
 }
 
 // GetBlock() 함수는 b instance를 얻을 수 있는 함수 입니다.
