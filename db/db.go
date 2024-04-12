@@ -14,7 +14,8 @@ const (
 
 var db *bolt.DB
 
-// singleton pattern
+// DB() 함수는 db 인스턴스를 load 및 초기화하는 함수 입니다.
+// singleton pattern 기반입니다.
 func DB() *bolt.DB {
 	if db == nil {
 		// initialize db
@@ -31,5 +32,23 @@ func DB() *bolt.DB {
 		utils.HandleErr(err)
 	}
 	return db
+}
 
+// SaveBlock 함수는 말 그대로 Block을 저장하는 함수 입니다.
+func SaveBlock(hash string, data []byte) {
+	err := DB().Update(func(t *bolt.Tx) error {
+		bucket := t.Bucket([]byte(blockBucket))
+		err := bucket.Put([]byte(hash), data)
+		return err
+	})
+	utils.HandleErr(err)
+}
+
+func SaveBlockchain(data []byte) {
+	err := DB().Update(func(t *bolt.Tx) error {
+		bucket := t.Bucket([]byte(dataBucket))
+		err := bucket.Put([]byte("checkpoint"), data)
+		return err
+	})
+	utils.HandleErr(err)
 }
