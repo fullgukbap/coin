@@ -1,12 +1,11 @@
 package blockchain
 
 import (
-	"bytes"
 	"crypto/sha256"
-	"encoding/gob"
 	"fmt"
 
 	"github.com/JJerBum/nomadcoin/db"
+	"github.com/JJerBum/nomadcoin/utils"
 )
 
 // Block 구조체는 blockchain의 block을 정의하는 구조체 입니다.
@@ -17,15 +16,8 @@ type Block struct {
 	Height   int    `json:"height"`
 }
 
-func (b *Block) toBytes() []byte {
-	var blockBuffer bytes.Buffer
-	encoder := gob.NewEncoder(&blockBuffer)
-	encoder.Encode(encoder.Encode(b))
-	return blockBuffer.Bytes()
-}
-
 func (b *Block) persist() {
-	db.SaveBlock(b.Hash, b.toBytes())
+	db.SaveBlock(b.Hash, utils.ToBytes(b))
 }
 
 // createBlock 함수는 block을 생성해주는 함수 입니다.
