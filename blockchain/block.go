@@ -14,13 +14,14 @@ type Block struct {
 }
 
 // createBlock 함수는 block을 생성해주는 함수 입니다.
-func createBlock(data string, prevHash string, height int) {
-	block := Block{
+func createBlock(data string, prevHash string, height int) *Block {
+	block := &Block{
 		Data:     data,
 		Hash:     "",
 		PrevHash: prevHash,
 		Height:   height,
 	}
 	payload := block.Data + block.PrevHash + fmt.Sprint(block.Height)
-	block.Hash = fmt.Sprintf("%s", sha256.Sum256([]byte(payload)))
+	block.Hash = fmt.Sprintf("%x", sha256.Sum256([]byte(payload)))
+	return block
 }
