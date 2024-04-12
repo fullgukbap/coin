@@ -14,6 +14,7 @@ const (
 
 var db *bolt.DB
 
+// singleton pattern
 func DB() *bolt.DB {
 	if db == nil {
 		// initialize db
@@ -28,7 +29,6 @@ func DB() *bolt.DB {
 			return err
 		})
 		utils.HandleErr(err)
-
 	}
 	return db
 
