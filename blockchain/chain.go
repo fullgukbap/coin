@@ -1,68 +1,70 @@
-// blockchain 패키지는 blockchain을 구현하는 구조체 입니다.
+/*
+Blockchain 패키지는 blockchain의 내부 로직을 구현하는 패키지 입니다.
+본 패키지를 사용하여 blockchain을 조작할 수 있으며, 싱글톤 패턴으로 구현되어 있습니다.
+*/
 package blockchain
 
 import (
-	"bytes"
-	"encoding/gob"
 	"fmt"
 	"sync"
 
-	"github.com/JJerBum/nomadcoin/db"
-	"github.com/JJerBum/nomadcoin/utils"
+	"github.com/fullgukbap/coin/db"
+	"github.com/fullgukbap/coin/utils"
 )
 
-// blockchain 구조체는 blockchain을 정의하는 구조체 입니다.
-// 데이터베이스 값을 저장함으로 NewestHash(가장 최신의 hash)와, 몇개의 블럭이 존재하는지만 저장하면 됩니다.
-type blockchain struct {
-	NewestHash string `json:"newestHash"`
-	Height     int    `json:"height"`
-}
-
-// b 인스턴스는 singleton pattern으로, 해당 인스턴스를 application에 공유하는 것이 아니라 어떠한 함수를 통해 공유합니다.
-// 이렇게 하면 instance를 b instance의 초기화를 제어할 수 있습니다.
+// b 변수는 blockchain의 인스턴스 입니다.
 var b *blockchain
 
-// once는 Do method를 사용하기 위해 선언한 변수 입니다.
+// blockchain 구조체는 블럭체인의 구성요소 및 구조를 정의합니다.
+// 데이터베이스를 이용해 영속성을 제공하기 때문에 구조가 아래와 같아도 됩니다.
+type blockchain struct {
+	// 가장 최신의 블럭의 Hash값
+	NewestHash string `json:"newestHash"`
+	// 현재 블럭의 개수
+	Height int `json:"height"`
+}
+
+// once 변수는 Blockchain 함수의 once.Do 함수를 호출하기 위해 사용됩니다.
+// 정교한 싱글톤 패턴 구현을 위해 사용됩니다.
 var once sync.Once
 
-func (b *blockchain) restore(data []byte) {
-	decoder := gob.NewDecoder(bytes.NewReader(data))
-	utils.HandleErr(decoder.Decode(b))
-}
-
-func (b *blockchain) persist() {
-	db.SaveBlockchain(utils.ToBytes(b))
-}
-
-func (b *blockchain) AddBlock(data string) {
-	block := createBlock(data, b.NewestHash, b.Height+1)
-	b.NewestHash = block.Hash
-	b.Height = block.Height
-	b.persist()
-}
-
-// GetBlock() 함수는 b instance를 얻을 수 있는 함수 입니다.
-// Singleton pattern을 사용함으로써 b instace의 초기화는 이 함수에서 다 이루어 집니다.
+// Blockchain 함수는 Blockchain 호출의 진입점 입니다.
+// 만약 처음 호출 시 blockchain인스턴스가 초기화 및 복구되며
+// 두 번 이상 호출 시 인스턴스를 반환합니다.
 func Blockchain() *blockchain {
 	if b == nil {
-		// Only once
 		once.Do(func() {
 			b = &blockchain{"", 0}
-			fmt.Printf("NewestHash: %s\nHeight: %d\n", b.NewestHash, b.Height)
 
-			// search for checkpoint on the db
+			//
 			checkpoint := db.Checkpoint()
 			if checkpoint == nil {
-				fmt.Printf("NewestHash: %s\nHeight: %d\n", b.NewestHash, b.Height)
 				b.AddBlock("Genesis block")
 			} else {
-				fmt.Printf("restoring\n")
 				// restore b from bytes
 				b.restore(checkpoint)
-				fmt.Printf("NewestHash: %s\nHeight: %d\n", b.NewestHash, b.Height)
 			}
 
 		})
 	}
 	return b
+}
+
+// AddBlock 함수는 data 값만 전달하여 블럭체인의 블럭을 추가하는 함수 입니다.
+func (b *blockchain) AddBlock(data string) {
+	block := createBlock(data, b.NewestHash, b.Height+1)
+	b.NewestHash = block.Hash
+	b.Height = block.Height
+	fmt.Println(block.Hash)
+	b.persist()
+}
+
+// restore 함수는 data의 값을 i로 복구시킵니다.
+func (b *blockchain) restore(data []byte) {
+	utils.FromBytes(b, data)
+}
+
+// persist 함수는 데이터베이스에 값을 저장하여 영속성을 부여합니다.
+func (b *blockchain) persist() {
+	db.SaveBlockchain(utils.ToBytes(b))
 }
