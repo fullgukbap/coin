@@ -45,7 +45,7 @@ func createBlock(data string, prevHash string, height int) *Block {
 // FindBlock 함수는 hash 값으로 데이터베이스에 있는 블럭을 탐색한 뒤 최종적으로 *Block, error를 반환합니다.
 func FindBlock(hash string) (*Block, error) {
 	blockBytes := db.Block(hash)
-	if blockBytes != nil {
+	if blockBytes == nil {
 		return nil, ErrNotFound
 	}
 	block := &Block{}

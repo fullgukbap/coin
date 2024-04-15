@@ -45,6 +45,7 @@ func Blockchain() *blockchain {
 				b.restore(checkpoint)
 			}
 
+			fmt.Println("hash: ", b.NewestHash)
 		})
 	}
 	return b
@@ -55,7 +56,6 @@ func (b *blockchain) AddBlock(data string) {
 	block := createBlock(data, b.NewestHash, b.Height+1)
 	b.NewestHash = block.Hash
 	b.Height = block.Height
-	fmt.Println(block.Hash)
 	b.persist()
 }
 

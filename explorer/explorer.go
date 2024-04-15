@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"text/template"
 
-	"github.com/JJerBum/nomadcoin/blockchain"
+	"github.com/fullgukbap/coin/blockchain"
 )
 
 const (
@@ -24,7 +24,8 @@ type homeData struct {
 
 // home 함수는 "/" 패턴으로 요청이 들어왔을 떄 처리하는 핸들러 입니다.
 func home(rw http.ResponseWriter, r *http.Request) {
-	data := homeData{"Home", blockchain.GetBlockchain().AllBlocks()}
+	// data := homeData{"Home", blockchain.GetBlockchain().AllBlocks()}
+	data := homeData{"Home", nil}
 
 	// ./templates/pages/home.gohtml에 구문 분석이 완료된 곳에 값 삽입
 	templates.ExecuteTemplate(rw, "home", data)
@@ -46,7 +47,7 @@ func add(rw http.ResponseWriter, r *http.Request) {
 		data := r.Form.Get("blockData")
 
 		// blockchain의 값을 추가
-		blockchain.GetBlockchain().AddBlock(data)
+		blockchain.Blockchain().AddBlock(data)
 
 		// response
 		http.Redirect(rw, r, "/", http.StatusPermanentRedirect)

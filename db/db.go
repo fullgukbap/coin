@@ -43,6 +43,7 @@ func DB() *bolt.DB {
 }
 
 // SaveBlockchain 함수는 data 값을 데이터베이스 저장합니다.
+// {"checkpoint": "[]byte of blockchain"}
 func SaveBlockchain(data []byte) {
 	err := DB().Update(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(dataBucket))
@@ -53,6 +54,7 @@ func SaveBlockchain(data []byte) {
 }
 
 // SaveBlock 함수는 말 그대로 Block을 저장하는 함수 입니다.
+// {"hash": "[]byte of instance"}
 func SaveBlock(hash string, data []byte) {
 	// fmt.Printf("Saving Block %s\nData: %b\n", hash, data)
 	err := DB().Update(func(t *bolt.Tx) error {

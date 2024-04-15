@@ -1,10 +1,14 @@
 package main
 
-import "github.com/JJerBum/nomadcoin/blockchain"
+import (
+	"github.com/fullgukbap/coin/blockchain"
+	"github.com/fullgukbap/coin/cli"
+)
 
 func main() {
-	// cli.Start()
-	blockchain.Blockchain().AddBlock("Good")
-	blockchain.Blockchain().AddBlock("xx")
-	blockchain.Blockchain().AddBlock("zz")
+	blockchain.Blockchain().AddBlock("first")
+	blockchain.Blockchain().AddBlock("third")
+	blockchain.Blockchain().AddBlock("second")
+
+	cli.Start()
 }
