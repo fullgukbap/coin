@@ -26,6 +26,12 @@ type Block struct {
 
 	// 현재 블럭의 index를 저장하는 변수 입니다.
 	Height int `json:"height"`
+
+	// 시작 부분의 0의 개수를 지정하는 변수 입니다.
+	Difficulty int `json:"difficulty"`
+
+	// Number used once의 약자로 채굴자들이 사용하는 변수 값
+	Nonce int `json:"nonce"`
 }
 
 // createBlock 함수는 data, prevHash, height 값을 받은 후 hash 값을 계산한 후 db에 저장합니다.
