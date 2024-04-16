@@ -5,7 +5,9 @@ package utils
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/gob"
+	"fmt"
 )
 
 // HandleErr 함수는 err의 값이 nil이 아니면 panic을 발생하는 함수 입니다.
@@ -29,4 +31,11 @@ func ToBytes(i any) []byte {
 func FromBytes(i any, data []byte) {
 	encoder := gob.NewDecoder(bytes.NewReader(data))
 	HandleErr(encoder.Decode(i))
+}
+
+// Hash 함수는 i의 값을 hash된 값으로 반환합니다.
+func Hash(i any) string {
+	s := fmt.Sprintf("%v", i)
+	hash := sha256.Sum256([]byte(s))
+	return fmt.Sprintf("%x", hash)
 }
