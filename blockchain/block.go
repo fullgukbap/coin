@@ -1,9 +1,9 @@
 package blockchain
 
 import (
-	"crypto/sha256"
 	"errors"
-	"fmt"
+	"strings"
+	"time"
 
 	"github.com/fullgukbap/coin/db"
 	"github.com/fullgukbap/coin/utils"
@@ -26,20 +26,51 @@ type Block struct {
 
 	// 현재 블럭의 index를 저장하는 변수 입니다.
 	Height int `json:"height"`
+
+	// 시작 부분의 0의 개수를 지정하는 변수 입니다.
+	// 네트워가 보유한 힘의 양에 따라서 유동적으로 값이 변하게 된다.
+	Difficulty int `json:"difficulty"`
+
+	// Number used once의 약자로 채굴자들이 사용하는 변수 값
+	Nonce int `json:"nonce"`
+
+	// Timestamp 변수는 블럭의 생성일을 저장합니다.
+	Timestamp int `json:"timestamp"`
 }
 
 // createBlock 함수는 data, prevHash, height 값을 받은 후 hash 값을 계산한 후 db에 저장합니다.
 func createBlock(data string, prevHash string, height int) *Block {
 	block := &Block{
-		Data:     data,
-		Hash:     "",
-		PrevHash: prevHash,
-		Height:   height,
+		Data:       data,
+		Hash:       "",
+		PrevHash:   prevHash,
+		Height:     height,
+		Difficulty: Blockchain().Difficulty(),
+		Nonce:      0,
+		// 이렇게 하게 되면 체굴 과정의 시간은 생략되기 때문에 정확하지 않은 생성일이 들어감, 고로 초기화에 시간을 넣지 않고, mine에 넣을 거임
+		// Timestamp: int(time.Now().Unix()),
 	}
-	payload := block.Data + block.PrevHash + fmt.Sprint(block.Height)
-	block.Hash = fmt.Sprintf("%x", sha256.Sum256([]byte(payload)))
+	block.mine()
 	block.persist()
 	return block
+}
+
+// mine 함수는 말 그래도 채굴을 수행합니다.
+// 채굴을 수행하여 결과적으로 생긴 hash값을 대입해줍니다.
+func (b *Block) mine() {
+	target := strings.Repeat("0", b.Difficulty)
+	for {
+		b.Timestamp = int(time.Now().Unix())
+		hash := utils.Hash(b)
+		// fmt.Printf("[MINING..]\nhash: %s\ntarget:%s\nNonce:%d\n\n", hash, target, b.Nonce)
+		if strings.HasPrefix(hash, target) {
+			b.Hash = hash
+			// fmt.Printf("[CACHED!]\nhash: %s\ntarget:%s\nNonce:%d\n\n", hash, target, b.Nonce)
+			break
+		} else {
+			b.Nonce++
+		}
+	}
 }
 
 // FindBlock 함수는 hash 값으로 데이터베이스에 있는 블럭을 탐색한 뒤 최종적으로 *Block, error를 반환합니다.
