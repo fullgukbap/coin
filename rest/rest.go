@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/fullgukbap/coin/blockchain"
+	"github.com/fullgukbap/coin/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -68,15 +69,12 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		return
-		// json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
+		json.NewEncoder(rw).Encode(blockchain.Blockchain().Blocks())
 	case http.MethodPost:
-		// request client example body -> {"message": "my block data"}
-		return
-		// var addBlockBody addBlockBody
-		// utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
-		// blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
-		// rw.WriteHeader(http.StatusCreated)
+		addBlockBody := addBlockBody{}
+		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
+		blockchain.Blockchain().AddBlock(addBlockBody.Message)
+		rw.WriteHeader(http.StatusCreated)
 	}
 }
 

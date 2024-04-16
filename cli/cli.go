@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/fullgukbap/coin/explorer"
 	"github.com/fullgukbap/coin/rest"
@@ -14,7 +15,7 @@ func usage() {
 	fmt.Printf("Please use the following flags:\n\n")
 	fmt.Printf("explorer:   Set the PORT of the server\n")
 	fmt.Printf("rest:       Choose between 'html', and 'rest'\n\n")
-	os.Exit(1)
+	runtime.Goexit()
 }
 
 func Start() {

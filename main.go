@@ -3,12 +3,12 @@ package main
 import (
 	"github.com/fullgukbap/coin/blockchain"
 	"github.com/fullgukbap/coin/cli"
+	"github.com/fullgukbap/coin/db"
 )
 
 func main() {
-	blockchain.Blockchain().AddBlock("first")
-	blockchain.Blockchain().AddBlock("third")
-	blockchain.Blockchain().AddBlock("second")
+	blockchain.Blockchain()
+	defer db.Close()
 
 	cli.Start()
 }

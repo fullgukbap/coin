@@ -5,7 +5,6 @@ Blockchain 패키지는 blockchain의 내부 로직을 구현하는 패키지 �
 package blockchain
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/fullgukbap/coin/db"
@@ -44,8 +43,6 @@ func Blockchain() *blockchain {
 				// restore b from bytes
 				b.restore(checkpoint)
 			}
-
-			fmt.Println("hash: ", b.NewestHash)
 		})
 	}
 	return b
