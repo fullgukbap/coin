@@ -59,6 +59,22 @@ func (b *blockchain) AddBlock(data string) {
 	b.persist()
 }
 
+// Blocks 함수는 blockchain의 모든 블럭을 반환합니다.
+func (b *blockchain) Blocks() (blocks []*Block) {
+	hashCursor := b.NewestHash
+	for {
+		block, _ := FindBlock(hashCursor)
+		blocks = append(blocks, block)
+		if block.PrevHash != "" {
+			hashCursor = block.PrevHash
+		} else {
+			break
+		}
+	}
+
+	return blocks
+}
+
 // restore 함수는 data의 값을 i로 복구시킵니다.
 func (b *blockchain) restore(data []byte) {
 	utils.FromBytes(b, data)
