@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/fullgukbap/coin/db"
 	"github.com/fullgukbap/coin/utils"
@@ -37,6 +38,9 @@ type Block struct {
 
 	// Number used once의 약자로 채굴자들이 사용하는 변수 값
 	Nonce int `json:"nonce"`
+
+	// Timestamp 변수는 블럭의 생성일을 저장합니다.
+	Timestamp int `json:"timestamp"`
 }
 
 // createBlock 함수는 data, prevHash, height 값을 받은 후 hash 값을 계산한 후 db에 저장합니다.
@@ -48,6 +52,8 @@ func createBlock(data string, prevHash string, height int) *Block {
 		Height:     height,
 		Difficulty: difficulty,
 		Nonce:      0,
+		// 이렇게 하게 되면 체굴 과정의 시간은 생략되기 때문에 정확하지 않은 생성일이 들어감, 고로 초기화에 시간을 넣지 않고, mine에 넣을 거임
+		// Timestamp: int(time.Now().Unix()),
 	}
 	block.mine()
 	block.persist()
@@ -59,6 +65,7 @@ func createBlock(data string, prevHash string, height int) *Block {
 func (b *Block) mine() {
 	target := strings.Repeat("0", b.Difficulty)
 	for {
+		b.Timestamp = int(time.Now().Unix())
 		hash := utils.Hash(b)
 		if strings.HasPrefix(hash, target) {
 			b.Hash = hash
