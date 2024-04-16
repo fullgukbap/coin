@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/fullgukbap/coin/db"
 	"github.com/fullgukbap/coin/utils"
@@ -11,6 +12,10 @@ import (
 
 // ErrNotFound 변수는 블럭을 찾이 못했을 때 사용됩니다.
 var ErrNotFound = errors.New("block not found")
+
+// difficulty의 초기 값은 2이다.
+// 앞에 0이 두개가 되는 hash 값을 찾아야 한다는 뜻이다.
+const difficulty int = 2
 
 // Block 구조체는 블럭체인의 한 개의 노드에 해당되는 구조를 정의했습니다.
 type Block struct {
@@ -28,6 +33,7 @@ type Block struct {
 	Height int `json:"height"`
 
 	// 시작 부분의 0의 개수를 지정하는 변수 입니다.
+	// 네트워가 보유한 힘의 양에 따라서 유동적으로 값이 변하게 된다.
 	Difficulty int `json:"difficulty"`
 
 	// Number used once의 약자로 채굴자들이 사용하는 변수 값
@@ -37,15 +43,33 @@ type Block struct {
 // createBlock 함수는 data, prevHash, height 값을 받은 후 hash 값을 계산한 후 db에 저장합니다.
 func createBlock(data string, prevHash string, height int) *Block {
 	block := &Block{
-		Data:     data,
-		Hash:     "",
-		PrevHash: prevHash,
-		Height:   height,
+		Data:       data,
+		Hash:       "",
+		PrevHash:   prevHash,
+		Height:     height,
+		Difficulty: difficulty,
+		Nonce:      0,
 	}
-	payload := block.Data + block.PrevHash + fmt.Sprint(block.Height)
-	block.Hash = fmt.Sprintf("%x", sha256.Sum256([]byte(payload)))
+	block.mine()
 	block.persist()
 	return block
+}
+
+// mine 함수는 말 그래도 채굴을 수행합니다.
+// 채굴을 수행하여 결과적으로 생긴 hash값을 대입해줍니다.
+func (b *Block) mine() {
+	target := strings.Repeat("0", b.Difficulty)
+	for {
+		blockAsString := fmt.Sprint(b)
+		hash := fmt.Sprintf("%x", sha256.Sum256([]byte(blockAsString)))
+		if strings.HasPrefix(hash, target) {
+			b.Hash = hash
+			fmt.Println("caching!\nhash: ", hash)
+			break
+		} else {
+			b.Nonce++
+		}
+	}
 }
 
 // FindBlock 함수는 hash 값으로 데이터베이스에 있는 블럭을 탐색한 뒤 최종적으로 *Block, error를 반환합니다.
