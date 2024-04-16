@@ -14,6 +14,16 @@ import (
 // b 변수는 blockchain의 인스턴스 입니다.
 var b *blockchain
 
+const (
+	// defaultDifficuly는 초기 값이 2이다.
+	// 앞에 0이 두개가 되는 hash 값을 찾아야 한다는 뜻이다.
+	defaultDifficulty int = 2
+
+	// difficulty를 계산하는 주기
+	// 단위는 블럭입니다. 즉, 5개의 블럭이 생성되었다면 difficulty를 계산하게 됩니다.
+	difficultyInterval = 5
+)
+
 // blockchain 구조체는 블럭체인의 구성요소 및 구조를 정의합니다.
 // 데이터베이스를 이용해 영속성을 제공하기 때문에 구조가 아래와 같아도 됩니다.
 type blockchain struct {
@@ -21,6 +31,9 @@ type blockchain struct {
 	NewestHash string `json:"newestHash"`
 	// 현재 블럭의 개수
 	Height int `json:"height"`
+
+	// 현재 Difficulty의 수
+	CurrentDifficulty int `json:"currentDifficulty"`
 }
 
 // once 변수는 Blockchain 함수의 once.Do 함수를 호출하기 위해 사용됩니다.
@@ -33,9 +46,10 @@ var once sync.Once
 func Blockchain() *blockchain {
 	if b == nil {
 		once.Do(func() {
-			b = &blockchain{"", 0}
+			b = &blockchain{
+				Height: 0,
+			}
 
-			//
 			checkpoint := db.Checkpoint()
 			if checkpoint == nil {
 				b.AddBlock("Genesis block")
@@ -70,6 +84,19 @@ func (b *blockchain) Blocks() (blocks []*Block) {
 	}
 
 	return blocks
+}
+
+// difficulty 함수는 본 블럭체인의 difficulty의 값을 도출해냅니다.
+func (b *blockchain) Difficulty() int {
+	if b.Height == 0 {
+		return defaultDifficulty
+	}
+	if b.Height%difficultyInterval == 0 {
+		// 다시 difficluty 계산
+		// TODO: difficulty 다시 계산 로직 작성
+	}
+
+	return b.CurrentDifficulty
 }
 
 // restore 함수는 data의 값을 i로 복구시킵니다.

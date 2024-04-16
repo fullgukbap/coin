@@ -13,10 +13,6 @@ import (
 // ErrNotFound 변수는 블럭을 찾이 못했을 때 사용됩니다.
 var ErrNotFound = errors.New("block not found")
 
-// difficulty의 초기 값은 2이다.
-// 앞에 0이 두개가 되는 hash 값을 찾아야 한다는 뜻이다.
-const difficulty int = 2
-
 // Block 구조체는 블럭체인의 한 개의 노드에 해당되는 구조를 정의했습니다.
 type Block struct {
 	// 값을 저장하는 변수 입니다.
@@ -50,7 +46,7 @@ func createBlock(data string, prevHash string, height int) *Block {
 		Hash:       "",
 		PrevHash:   prevHash,
 		Height:     height,
-		Difficulty: difficulty,
+		Difficulty: Blockchain().Difficulty(),
 		Nonce:      0,
 		// 이렇게 하게 되면 체굴 과정의 시간은 생략되기 때문에 정확하지 않은 생성일이 들어감, 고로 초기화에 시간을 넣지 않고, mine에 넣을 거임
 		// Timestamp: int(time.Now().Unix()),
