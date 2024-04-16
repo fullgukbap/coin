@@ -47,9 +47,9 @@ func Close() {
 	DB().Close()
 }
 
-// SaveBlockchain 함수는 data 값을 데이터베이스 저장합니다.
+// SaveCheckpoint 함수는 data 값을 데이터베이스 저장합니다.
 // {"checkpoint": "[]byte of blockchain"}
-func SaveBlockchain(data []byte) {
+func SaveCheckpoint(data []byte) {
 	err := DB().Update(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(dataBucket))
 		err := bucket.Put([]byte(checkpoint), data)

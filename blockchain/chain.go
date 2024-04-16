@@ -79,5 +79,5 @@ func (b *blockchain) restore(data []byte) {
 
 // persist 함수는 데이터베이스에 값을 저장하여 영속성을 부여합니다.
 func (b *blockchain) persist() {
-	db.SaveBlockchain(utils.ToBytes(b))
+	db.SaveCheckpoint(utils.ToBytes(b))
 }
