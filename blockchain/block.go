@@ -2,7 +2,6 @@ package blockchain
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -63,9 +62,10 @@ func (b *Block) mine() {
 	for {
 		b.Timestamp = int(time.Now().Unix())
 		hash := utils.Hash(b)
+		// fmt.Printf("[MINING..]\nhash: %s\ntarget:%s\nNonce:%d\n\n", hash, target, b.Nonce)
 		if strings.HasPrefix(hash, target) {
 			b.Hash = hash
-			fmt.Println("caching!\nhash: ", hash)
+			// fmt.Printf("[CACHED!]\nhash: %s\ntarget:%s\nNonce:%d\n\n", hash, target, b.Nonce)
 			break
 		} else {
 			b.Nonce++
