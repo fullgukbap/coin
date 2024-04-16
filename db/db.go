@@ -42,6 +42,11 @@ func DB() *bolt.DB {
 	return db
 }
 
+// Close 함수는 인스턴스를 정리하는 함수 입니다.
+func Close() {
+	DB().Close()
+}
+
 // SaveBlockchain 함수는 data 값을 데이터베이스 저장합니다.
 // {"checkpoint": "[]byte of blockchain"}
 func SaveBlockchain(data []byte) {
