@@ -41,11 +41,12 @@ type Block struct {
 // createBlock 함수는 data, prevHash, height 값을 받은 후 hash 값을 계산한 후 db에 저장합니다.
 func createBlock(prevHash string, height int) *Block {
 	block := &Block{
-		Hash:       "",
-		PrevHash:   prevHash,
-		Height:     height,
-		Difficulty: Blockchain().Difficulty(),
-		Nonce:      0,
+		Hash:         "",
+		PrevHash:     prevHash,
+		Height:       height,
+		Difficulty:   Blockchain().Difficulty(),
+		Nonce:        0,
+		Transactions: []*Tx{makeCoinbaseTx("gukbap")},
 		// 이렇게 하게 되면 체굴 과정의 시간은 생략되기 때문에 정확하지 않은 생성일이 들어감, 고로 초기화에 시간을 넣지 않고, mine에 넣을 거임
 		// Timestamp: int(time.Now().Unix()),
 	}
