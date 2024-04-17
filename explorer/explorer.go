@@ -43,11 +43,8 @@ func add(rw http.ResponseWriter, r *http.Request) {
 		// form.Vlaues는 ParseForm이 호춮된 후에만 사용이 가능하다.
 		r.ParseForm()
 
-		// form-data 값을 가져오기
-		data := r.Form.Get("blockData")
-
 		// blockchain의 값을 추가
-		blockchain.Blockchain().AddBlock(data)
+		blockchain.Blockchain().AddBlock()
 
 		// response
 		http.Redirect(rw, r, "/", http.StatusPermanentRedirect)
