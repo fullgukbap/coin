@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/fullgukbap/coin/blockchain"
+	"github.com/fullgukbap/coin/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -32,6 +33,11 @@ type urlDescription struct {
 
 type errResponse struct {
 	ErrorMessage string `json:"errorMessage"`
+}
+
+type balanceResponse struct {
+	Address string `json:"address"`
+	Balance int    `json:"balance"`
 }
 
 func documentation(rw http.ResponseWriter, r *http.Request) {
@@ -60,6 +66,11 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			URL:         url("/blocks"),
 			Method:      "POST",
 			Description: "Add a block",
+		},
+		{
+			URL:         url("/balance/{address}"),
+			Method:      "GET",
+			Description: "Get TxOuts for an Address",
 		},
 	}
 
@@ -100,6 +111,20 @@ func status(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(blockchain.Blockchain())
 }
 
+func balance(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	address := vars["address"]
+	total := r.URL.Query().Get("total")
+	switch total {
+	case "true":
+		amount := blockchain.Blockchain().BalanceByAddress(address)
+		utils.HandleErr(json.NewEncoder(rw).Encode(&balanceResponse{Address: address, Balance: amount}))
+	default:
+		utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Blockchain().TxOutsByAddress(address)))
+
+	}
+}
+
 func Start(aPort int) {
 	router := mux.NewRouter()
 	router.Use(jsonContentTypeMiddleware)
@@ -108,6 +133,7 @@ func Start(aPort int) {
 	router.HandleFunc("/status", status)
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	router.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET")
+	router.HandleFunc("/balance/{address}", balance)
 	fmt.Printf("Listening on localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
