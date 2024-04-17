@@ -77,6 +77,39 @@ func (b *blockchain) AddBlock() {
 	b.persist()
 }
 
+// txOuts 함수는 거래 이력 중 txOuts값만 추출하여 slice화 하여 반환합니다.
+func (b *blockchain) txOuts() []*TxOut {
+	var txOuts []*TxOut
+	blocks := b.Blocks()
+	for _, block := range blocks {
+		for _, tx := range block.Transactions {
+			txOuts = append(txOuts, tx.TxOuts...)
+		}
+	}
+	return txOuts
+}
+
+// TxOutsByAddress 함수는 거래 이력 중 address인 것만 추출하여 반환합니다.
+func (b *blockchain) TxOutsByAddress(address string) (ownedTxOuts []*TxOut) {
+	txOuts := b.txOuts()
+	for _, txOut := range txOuts {
+		if txOut.Owner == address {
+			ownedTxOuts = append(ownedTxOuts, txOut)
+		}
+	}
+
+	return ownedTxOuts
+}
+
+// BalanceByAddress 함수는 address의 tx의 값을 총합하여 반환합니다.
+func (b *blockchain) BalanceByAddress(address string) (amount int) {
+	txOuts := b.TxOutsByAddress(address)
+	for _, txOut := range txOuts {
+		amount += txOut.Amount
+	}
+	return amount
+}
+
 // Blocks 함수는 blockchain의 모든 블럭을 반환합니다.
 func (b *blockchain) Blocks() (blocks []*Block) {
 	hashCursor := b.NewestHash
