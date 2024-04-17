@@ -11,6 +11,16 @@ const (
 	minerReward int = 50
 )
 
+// mempool 구조체는 trasaction(거래)들을 저장하기 위해 사용됩니다.
+type mempool struct {
+	Txs []*Tx
+}
+
+// Mempool 변수는 mempool type의 인스턴스 이며, 효용은 구조체 주석과 같습니다.
+// export인 이유는 초기화 단계를 제어하는 것이 아님(-> 싱글톤 패턴을 사용할 필요가 없음)
+// 메모리에 있는 값을 보여주기만 해줘도 되기 때문이다.
+var Mempool *mempool = &mempool{}
+
 // Tx 구조체는 거래를 하기 위해 사용되는 정보로 구성됩니다.
 type Tx struct {
 	// Id 변수는 각각의 거래를 식별하기 위해 사용됩니다.
