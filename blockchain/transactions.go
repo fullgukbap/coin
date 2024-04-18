@@ -61,7 +61,7 @@ func makeTx(from /*보내는 이*/, to /*받는 이*/ string, amount /*보낼 �
 
 // addTx 함수는 tx를 하나 만든 뒤, m.Txs에 tx을 추가하는 함수 입니다.
 func (m *mempool) AddTx(to string, amount int) error {
-	tx, err := makeTx("nico", to, amount)
+	tx, err := makeTx("gukbap", to, amount)
 	if err != nil {
 		return err
 	}
