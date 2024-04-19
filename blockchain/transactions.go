@@ -117,3 +117,13 @@ func makeCoinbaseTx(address string) *Tx {
 	tx.getId()
 	return &tx
 }
+
+// TxToConfirm -> 승인할 트랙잭션들 가져오기
+// 그러나 이 함수는 많은 검증일 거치고 있지 않다
+func (m *mempool) TxToConfirm() []*Tx {
+	coinbase := makeCoinbaseTx("gukbap")
+	txs := m.Txs
+	txs = append(txs, coinbase)
+	m.Txs = nil
+	return txs
+}
