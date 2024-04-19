@@ -177,3 +177,26 @@ func (b *blockchain) restore(data []byte) {
 func (b *blockchain) persist() {
 	db.SaveCheckpoint(utils.ToBytes(b))
 }
+
+func (b *blockchain) UTxOutByAddress(address string) []*UTxOut {
+	var uTxOuts []*UTxOut
+	creatorIds := make(map[string]bool)
+	for _, block := range b.Blocks() {
+		for _, tx := range block.Transactions {
+			for _, input := range tx.TxIns {
+				if input.Owner == address {
+					creatorIds[input.TxID] = true
+				}
+			}
+
+			for index, output := range tx.TxOuts {
+				if _, ok := creatorIds[tx.Id]; !ok {
+					uTxOuts = append(uTxOuts, &UTxOut{tx.Id, index, output.Amount})
+				}
+
+			}
+		}
+	}
+
+	return uTxOuts
+}
