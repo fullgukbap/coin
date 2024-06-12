@@ -24,39 +24,29 @@ var Mempool *mempool = &mempool{}
 
 // makeTx 함수는 거래를 생성합니다.
 func makeTx(from /*보내는 이*/, to /*받는 이*/ string, amount /*보낼 돈*/ int) (*Tx, error) {
-	// 돈이 충분한가?
 	if Blockchain().BalanceByAddress(from) < amount {
 		return nil, errors.New("not enough money")
 	}
 
-	var txIns []*TxIn
 	var txOuts []*TxOut
+	var txIns []*TxIn
 	total := 0
-
-	oldTxOuts := Blockchain().TxOutsByAddress(from)
-	for _, txOut := range oldTxOuts {
+	uTxOuts := Blockchain().UTxOutByAddress(from)
+	for _, uTxOut := range uTxOuts {
 		if total > amount {
 			break
 		}
-		total += txOut.Amount
-		txIns = append(txIns, &TxIn{txOut.Owner, txOut.Amount})
+		txIn := &TxIn{uTxOut.TxID, uTxOut.Index, from}
+		txIns = append(txIns, txIn)
+		total += uTxOut.Amount
 	}
-
-	change := total - amount
-	// 값이 0이면 txOuts(from)에 표현하지 않음
-	if change != 0 {
-		txOuts = append(txOuts, &TxOut{from, change})
+	if change := total - amount; change != 0 {
+		changeTxOut := &TxOut{from, change}
+		txOuts = append(txOuts, changeTxOut)
 	}
-
-	txOuts = append(txOuts, &TxOut{to, amount})
-	tx := &Tx{
-		Id:        "",
-		Timestamp: int(time.Now().Unix()),
-		TxIns:     txIns,
-		TxOuts:    txOuts,
-	}
-	tx.getId()
-	return tx, nil
+	txOut := &TxOut{to, amount}
+	txOuts = append(txOuts, txOut)
+	tx := &Tx{}
 }
 
 // addTx 함수는 tx를 하나 만든 뒤, m.Txs에 tx을 추가하는 함수 입니다.
@@ -87,9 +77,9 @@ func (t *Tx) getId() {
 
 // TxIn 구조체는 거래의 Input의 구성요소가 존재합니다.
 type TxIn struct {
-	// Owner는 소유주를 나타냅니다.
-	Owner  string `json:"owner"`
-	Amount int    `json:"amount"`
+	TxID  string `json:"txId"`
+	Index int    `json:"index"`
+	Owner string `json:"owner"`
 }
 
 // TxOuts 구조체는 거래의 Output의 구성요소가 존재합니다.
@@ -99,10 +89,17 @@ type TxOut struct {
 	Amount int    `json:"amount"`
 }
 
+// UTxOut(Unspent Trasanction Output)
+type UTxOut struct {
+	TxID   string
+	Index  int
+	Amount int
+}
+
 // makeCoinbaseTx 함수는 채굴자를 주소로 삼는 코인베이스 거래내역을 생성해 *Tx 포인터를 반환합니다.
 func makeCoinbaseTx(address string) *Tx {
 	txIns := []*TxIn{
-		{"COINBASE", minerReward},
+		{"", -1, "COINBASE"},
 	}
 
 	txOuts := []*TxOut{
