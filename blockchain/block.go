@@ -14,8 +14,7 @@ var ErrNotFound = errors.New("block not found")
 
 // Block 구조체는 블럭체인의 한 개의 노드에 해당되는 구조를 정의했습니다.
 type Block struct {
-	// 값을 저장하는 변수 입니다.
-	Data string `json:"data"`
+	Transactions []*Tx `json:"transactions"`
 
 	// 현재 블럭의 Hash값을 저장하는 변수 입니다.
 	// 현재 블럭의 Hash값은 일방향 함수(Data + PrevHash + Height)으로 구성됩니다.
@@ -39,9 +38,8 @@ type Block struct {
 }
 
 // createBlock 함수는 data, prevHash, height 값을 받은 후 hash 값을 계산한 후 db에 저장합니다.
-func createBlock(data string, prevHash string, height int) *Block {
+func createBlock(prevHash string, height int) *Block {
 	block := &Block{
-		Data:       data,
 		Hash:       "",
 		PrevHash:   prevHash,
 		Height:     height,
