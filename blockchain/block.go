@@ -47,6 +47,7 @@ func createBlock(prevHash string, height int) *Block {
 		Nonce:      0,
 		// 이렇게 하게 되면 체굴 과정의 시간은 생략되기 때문에 정확하지 않은 생성일이 들어감, 고로 초기화에 시간을 넣지 않고, mine에 넣을 거임
 		// Timestamp: int(time.Now().Unix()),
+		Transactions: []*Tx{makeCoinbaseTx("mario")},
 	}
 	block.mine()
 	block.persist()
