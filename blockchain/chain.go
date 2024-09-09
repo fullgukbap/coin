@@ -68,6 +68,42 @@ func Blockchain() *blockchain {
 	return b
 }
 
+func (b *blockchain) txOuts() []*TxOut {
+	var txOuts []*TxOut
+
+	blocks := b.Blocks()
+	for _, block := range blocks {
+		for _, tx := range block.Transactions {
+			txOuts = append(txOuts, tx.TxOuts...)
+		}
+	}
+
+	return txOuts
+}
+
+func (b *blockchain) TxOutsByAddress(address string) []*TxOut {
+	var ownedTxOuts []*TxOut
+	txOuts := b.txOuts()
+
+	for _, txOut := range txOuts {
+		if txOut.Owner == address {
+			ownedTxOuts = append(ownedTxOuts, txOut)
+		}
+	}
+
+	return ownedTxOuts
+}
+
+func (b *blockchain) BalanceByAddress(address string) int {
+	txOuts := b.TxOutsByAddress(address)
+	var amount int
+	for _, txOut := range txOuts {
+		amount += txOut.Amount
+	}
+
+	return amount
+}
+
 // AddBlock 함수는 data 값만 전달하여 블럭체인의 블럭을 추가하는 함수 입니다.
 func (b *blockchain) AddBlock() {
 	block := createBlock(b.NewestHash, b.Height+1)
