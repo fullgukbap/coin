@@ -22,13 +22,13 @@ func (t *Tx) getId() {
 }
 
 type TxIn struct {
-	Owner  string
-	Amount int
+	Owner  string `json:"owner"`
+	Amount int    `json:"amount"`
 }
 
 type TxOut struct {
-	Owner  string
-	Amount int
+	Owner  string `json:"owner"`
+	Amount int    `json:"amount"`
 }
 
 // 채굴자를 주소로 삼는 코인베이스 거래내역을 생성한다.
