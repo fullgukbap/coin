@@ -24,7 +24,7 @@ func Start() {
 		usage()
 	}
 
-	port := flag.Int("port", 4000, "Set port of the server")
+	port := flag.Int("port", 8080, "Set port of the server")
 	model := flag.String("mode", "rest", "Choose between 'html', and 'rest'")
 
 	flag.Parse()

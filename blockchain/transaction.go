@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"errors"
 	"time"
 
 	"github.com/fullgukbap/coin/utils"
@@ -9,6 +10,78 @@ import (
 const (
 	minerReward int = 50
 )
+
+type mempool struct {
+	Txs []*Tx
+}
+
+var Mempool *mempool = &mempool{}
+
+func makeTx(from, to string, amount int) (*Tx, error) {
+	// 유효한 Tx를 생성할 수 있나?
+	if Blockchain().BalanceByAddress(from) < amount {
+		return nil, errors.New("not enough money")
+	}
+
+	// 유효한 Tx을 생성하자.
+	var txIns []*TxIn
+	var txOuts []*TxOut
+	var total int
+
+	oldTxOuts := Blockchain().TxOutsByAddress(from)
+
+	for _, txOut := range oldTxOuts {
+		if total > amount {
+			break
+		}
+
+		txIn := &TxIn{
+			Owner:  txOut.Owner,
+			Amount: txOut.Amount,
+		}
+		txIns = append(txIns, txIn)
+		total += txOut.Amount
+
+	}
+
+	// 잔돈 구현
+	change := total - amount
+	if change != 0 {
+		changeTxOut := &TxOut{
+			Owner:  from,
+			Amount: change,
+		}
+
+		txOuts = append(txOuts, changeTxOut)
+	}
+
+	txOut := &TxOut{
+		Owner:  to,
+		Amount: amount,
+	}
+
+	txOuts = append(txOuts, txOut)
+
+	tx := &Tx{
+		Timestamp: int(time.Now().Unix()),
+		TxIns:     txIns,
+		TxOuts:    txOuts,
+	}
+
+	tx.getId()
+
+	return tx, nil
+}
+
+func (m *mempool) AddTx(to string, amount int) error {
+	tx, err := makeTx("fullgukbap", to, amount)
+	if err != nil {
+		return err
+	}
+
+	m.Txs = append(m.Txs, tx)
+	return nil
+}
 
 type Tx struct {
 	Id        string   `json:"id"` // Id = hash(timestamp + txIns + TxOuts)
