@@ -125,3 +125,12 @@ func makeCoinbaseTx(address string) *Tx {
 
 	return tx
 }
+
+func (m *mempool) TxToConfirm() []*Tx {
+	coinbase := makeCoinbaseTx("fullgukbap")
+	txs := m.Txs
+	txs = append(txs, coinbase)
+	m.Txs = nil
+
+	return txs
+}
