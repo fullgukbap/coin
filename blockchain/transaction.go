@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"errors"
 	"time"
 
 	"github.com/fullgukbap/coin/utils"
@@ -17,61 +16,12 @@ type mempool struct {
 
 var Mempool *mempool = &mempool{}
 
-func makeTx(from, to string, amount int) (*Tx, error) {
-	// 유효한 Tx를 생성할 수 있나?
-	if Blockchain().BalanceByAddress(from) < amount {
-		return nil, errors.New("not enough money")
-	}
+// func makeTx(from, to string, amount int) (*Tx, error) {
+// 	if Blockchain().BalanceByAddress(from) < amount {
+// 		return nil, errors.New("not enough money")
+// 	}
 
-	// 유효한 Tx을 생성하자.
-	var txIns []*TxIn
-	var txOuts []*TxOut
-	var total int
-
-	oldTxOuts := Blockchain().TxOutsByAddress(from)
-
-	for _, txOut := range oldTxOuts {
-		if total > amount {
-			break
-		}
-
-		txIn := &TxIn{
-			Owner:  txOut.Owner,
-			Amount: txOut.Amount,
-		}
-		txIns = append(txIns, txIn)
-		total += txOut.Amount
-
-	}
-
-	// 잔돈 구현
-	change := total - amount
-	if change != 0 {
-		changeTxOut := &TxOut{
-			Owner:  from,
-			Amount: change,
-		}
-
-		txOuts = append(txOuts, changeTxOut)
-	}
-
-	txOut := &TxOut{
-		Owner:  to,
-		Amount: amount,
-	}
-
-	txOuts = append(txOuts, txOut)
-
-	tx := &Tx{
-		Timestamp: int(time.Now().Unix()),
-		TxIns:     txIns,
-		TxOuts:    txOuts,
-	}
-
-	tx.getId()
-
-	return tx, nil
-}
+// }
 
 func (m *mempool) AddTx(to string, amount int) error {
 	tx, err := makeTx("fullgukbap", to, amount)
@@ -95,8 +45,19 @@ func (t *Tx) getId() {
 }
 
 type TxIn struct {
-	Owner  string `json:"owner"`
-	Amount int    `json:"amount"`
+	// 참고한 utxout의 transcation id
+	TxID string
+	// 참고한 utxout의 id
+	Index int
+	Owner string `json:"owner"`
+}
+
+type UTxOut struct {
+	TxID string
+
+	// input을 생성한 output의 index
+	Index  int
+	Amount int
 }
 
 type TxOut struct {
@@ -107,7 +68,7 @@ type TxOut struct {
 // 채굴자를 주소로 삼는 코인베이스 거래내역을 생성한다.
 func makeCoinbaseTx(address string) *Tx {
 	txIns := []*TxIn{
-		{"COINBASE", minerReward},
+		{"", -1, "COINBASE"},
 	}
 
 	txOuts := []*TxOut{
