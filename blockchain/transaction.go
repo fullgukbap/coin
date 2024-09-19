@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"errors"
 	"time"
 
 	"github.com/fullgukbap/coin/utils"
@@ -16,12 +17,55 @@ type mempool struct {
 
 var Mempool *mempool = &mempool{}
 
-// func makeTx(from, to string, amount int) (*Tx, error) {
-// 	if Blockchain().BalanceByAddress(from) < amount {
-// 		return nil, errors.New("not enough money")
-// 	}
+func makeTx(from, to string, amount int) (*Tx, error) {
+	if Blockchain().BalanceByAddress(from) < amount {
+		return nil, errors.New("not enough money")
+	}
 
-// }
+	var txOuts []*TxOut
+	var txIns []*TxIn
+	total := 0
+	uTxOuts := Blockchain().UTxOutsByAddress(from)
+
+	// 소유하고 있는 Unspent Trasanction Output을 이용해 amount 보다 큰 수 구하기
+	for _, uTxOut := range uTxOuts {
+		if total > amount {
+			break
+		}
+		txIn := &TxIn{
+			TxID:  uTxOut.TxID,
+			Index: uTxOut.Index,
+			Owner: from,
+		}
+		txIns = append(txIns, txIn)
+		total += uTxOut.Amount
+	}
+
+	// 만약 잔돈을 반환해 줘야 한다면?
+	if change := total - amount; change != 0 {
+		changeTxOut := &TxOut{
+			Owner:  from,
+			Amount: change,
+		}
+		txOuts = append(txOuts, changeTxOut)
+	}
+
+	txOut := &TxOut{
+		Owner:  to,
+		Amount: amount,
+	}
+	txOuts = append(txOuts, txOut)
+
+	tx := &Tx{
+		Id:        "",
+		Timestamp: int(time.Now().Unix()),
+		TxIns:     txIns,
+		TxOuts:    txOuts,
+	}
+	tx.getId()
+
+	return tx, nil
+}
 
 func (m *mempool) AddTx(to string, amount int) error {
 	tx, err := makeTx("fullgukbap", to, amount)
@@ -58,6 +102,17 @@ type UTxOut struct {
 	// input을 생성한 output의 index
 	Index  int
 	Amount int
+}
+
+func isOnMempool(uTxOut *UTxOut) bool {
+	exists := false
+	for _, tx := range Mempool.Txs {
+		for _, input := range tx.TxIns {
+			exists = input.TxID == uTxOut.TxID && input.Index == uTxOut.Index
+		}
+	}
+
+	return exists
 }
 
 type TxOut struct {
