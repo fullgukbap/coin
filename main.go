@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/fullgukbap/coin/cli"
-	"github.com/fullgukbap/coin/db"
+	"coin/cli"
+	"coin/db"
 )
 
 func main() {

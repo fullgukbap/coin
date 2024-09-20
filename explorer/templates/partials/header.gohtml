@@ -1,19 +1,16 @@
 {{define "header"}}
 <header>
-    <nav>
-        <a href="/"> <h1>NomadCoin</h1> </a>
-
+      <nav>
+        <a href="/"><h1>노마드 코인</h1></a>
         <ul>
-            <li>
-                <a href="/">Home</a>
-            </li>
-
-            <li>
-                <a href="/add">Add</a>
-            </li>
+          <li>
+            <a href="/">Home</a>
+          </li>
+          <li>
+            <a href="/add">Add</a>
+          </li>
         </ul>
-    </nav>
-    {{/* 헤더는 home에 요청이 되고, .PateTitle로 값을 넘겨주었기 때문에 .으로 대입해준다. */}}
-    <h1>{{.}}</h1>
-</header>
+      </nav>
+      <h1>{{.}}</h1>
+    </header>
 {{end}}

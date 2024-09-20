@@ -1,15 +1,12 @@
 {{define "block"}}
-    <div>
-        <ul>
-            <li>Data: {{.Data}}</li>
-            <li>Hash: {{.Hash}}</li>
-            {{if .PrevHash}}
-                {{/* 행상 html은 닫는 태극가 있어야 한다.  */}}
-                <li>prveious hash: {{.PrevHash}}</li>
-            {{end}}
-        </ul>
+ <div>
+    <ul>
+        <li><strong>Data: </strong>{{.Data}}</li>
+        <li><strong>Hash: </strong>{{.Hash}}</li>
+        {{if .PrevHash}}
+        <li><strong>Previous Hash: </strong>{{.PrevHash}}</li>
+        {{end}}
+    </ul>
     </div>
-    <hr/>
+    <hr />
 {{end}}
-
-

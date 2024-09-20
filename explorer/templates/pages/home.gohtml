@@ -1,21 +1,15 @@
 {{define "home"}}
 <!DOCTYPE html>
 <html lang="en">
-
-{{template "head" .PageTitle}}
-
-<body>
-    {{/* Header partial 에서는 PageTitle값을 원하므로 우리가 값을 넣어줌 */}}
+  {{template "head" .PageTitle}}
+  <body>
     {{template "header" .PageTitle}}
-
     <main>
-        {{range .Blocks}}
-            {{/* .은 blocks의 각각의 block을 뜻한다.  */}}
-            {{template "block" .}}
-        {{end}}
+    {{range .Blocks}}
+      {{template "block" .}}
+    {{end}}
     </main>
-
-    {{template "footer"}}
-</body>
+  {{template "footer"}}
+  </body>
 </html>
 {{end}}

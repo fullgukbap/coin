@@ -6,33 +6,32 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/fullgukbap/coin/explorer"
-	"github.com/fullgukbap/coin/rest"
+	"github.com/nomadcoders/nomadcoin/explorer"
+	"github.com/nomadcoders/nomadcoin/rest"
 )
 
 func usage() {
-	fmt.Printf("Welcome to NomadCoin\n\n")
+	fmt.Printf("Welcome to 노마드 코인\n\n")
 	fmt.Printf("Please use the following flags:\n\n")
-	fmt.Printf("explorer:   Set the PORT of the server\n")
-	fmt.Printf("rest:       Choose between 'html', and 'rest'\n\n")
+	fmt.Printf("-port:		Set the PORT of the server\n")
+	fmt.Printf("-mode:		Choose between 'html' and 'rest'\n\n")
 	runtime.Goexit()
 }
 
 func Start() {
-
 	if len(os.Args) == 1 {
 		usage()
 	}
 
-	port := flag.Int("port", 8080, "Set port of the server")
-	model := flag.String("mode", "rest", "Choose between 'html', and 'rest'")
+	port := flag.Int("port", 4000, "Set port of the server")
+	mode := flag.String("mode", "rest", "Choose between 'html' and 'rest'")
 
 	flag.Parse()
 
-	switch *model {
+	switch *mode {
 	case "rest":
 		rest.Start(*port)
-	case "port":
+	case "html":
 		explorer.Start(*port)
 	default:
 		usage()
