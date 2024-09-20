@@ -1,13 +1,13 @@
 package blockchain
 
 import (
+	"coin/db"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/nomadcoders/nomadcoin/db"
-	"github.com/nomadcoders/nomadcoin/utils"
+	"coin/utils"
 )
 
 type Block struct {
@@ -55,12 +55,12 @@ func (b *Block) mine() {
 	}
 }
 
-func createBlock(prevHash string, height, diff int) *Block {
+func createBlock(prevHash string, height int) *Block {
 	block := &Block{
 		Hash:       "",
 		PrevHash:   prevHash,
 		Height:     height,
-		Difficulty: diff,
+		Difficulty: difficulty(Blockchain()),
 		Nonce:      0,
 	}
 	block.mine()

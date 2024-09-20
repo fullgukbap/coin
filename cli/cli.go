@@ -1,13 +1,12 @@
 package cli
 
 import (
+	"coin/explorer"
+	"coin/rest"
 	"flag"
 	"fmt"
 	"os"
 	"runtime"
-
-	"github.com/nomadcoders/nomadcoin/explorer"
-	"github.com/nomadcoders/nomadcoin/rest"
 )
 
 func usage() {

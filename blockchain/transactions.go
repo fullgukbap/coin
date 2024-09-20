@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/nomadcoders/nomadcoin/utils"
+	"coin/utils"
 )
 
 const (

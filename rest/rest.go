@@ -1,14 +1,14 @@
 package rest
 
 import (
+	"coin/blockchain"
+	"coin/utils"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/nomadcoders/nomadcoin/blockchain"
-	"github.com/nomadcoders/nomadcoin/utils"
 )
 
 var port string

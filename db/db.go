@@ -1,8 +1,9 @@
 package db
 
 import (
+	"coin/utils"
+
 	"github.com/boltdb/bolt"
-	"github.com/nomadcoders/nomadcoin/utils"
 )
 
 const (

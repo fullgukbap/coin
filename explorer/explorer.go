@@ -1,12 +1,11 @@
 package explorer
 
 import (
+	"coin/blockchain"
 	"fmt"
 	"log"
 	"net/http"
 	"text/template"
-
-	"github.com/nomadcoders/nomadcoin/blockchain"
 )
 
 const (
